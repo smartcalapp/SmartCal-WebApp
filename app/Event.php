@@ -23,8 +23,10 @@ class Event extends Model
         'freq_start',
         'freq_end',
         'freq_byday',
-        'freq_bymonthday'
-
+        'freq_bymonthday',
+        'published',
+        'description',
+        'tags'
     ];
 
     /**

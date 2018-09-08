@@ -18,26 +18,29 @@ class CreateEventsTable extends Migration
            $table->uuid('uuid')->unique();
            $table->char('url', 64)->unique();
            $table->char('name', 128);
-            $table->softDeletes();
-            $table->timestamps();
+           $table->softDeletes();
+           $table->timestamps();
         });
 
         Schema::create('organizations', function(Blueprint $table) {
             $table->increments('id');
             $table->uuid('uuid')->unique();
             $table->char('name', 128);
-            $table->uuid('parent_site');
+            $table->unsignedInteger('site_id');
             $table->softDeletes();
             $table->timestamps();
 
-            $table->foreign('parent_site')->references('uuid')->on('sites');
+            $table->foreign('site_id')->references('id')->on('sites');
         });
 
         Schema::create('events', function (Blueprint $table) {
             $table->increments('id');
             $table->uuid('uuid')->unique();
-            $table->uuid('parent_organization');
+            $table->unsignedInteger('organization_id');
             $table->char('name', 128);
+            $table->boolean('published')->default(false);
+            $table->text("description")->nullable();
+            $table->json('tags')->nullable();
             $table->timestamp('start_time');
             $table->timestamp('end_time');
             $table->timestamp('freq_interval')->nullable();
@@ -48,29 +51,33 @@ class CreateEventsTable extends Migration
             $table->softDeletes();
             $table->timestamps();
 
-            $table->foreign('parent_organization')->references('uuid')->on('organizations');
+            $table->foreign('organization_id')->references('id')->on('organizations');
         });
 
         Schema::create('sites_roles_pivot', function(Blueprint $table) {
-            $table->uuid('parent_site');
-            $table->uuid('parent_user');
-            $table->enum('authorization', ['owner', 'admin', 'user']);
+            $table->increments('id');
+            $table->uuid('uuid')->unique();
+            $table->unsignedInteger('site_id');
+            $table->unsignedInteger('user_id');
+            $table->enum('authorization', ['owner', 'admin', 'readonly']);
             $table->softDeletes();
             $table->timestamps();
 
-            $table->foreign('parent_site')->references('uuid')->on('sites');
-            $table->foreign('parent_user')->references('uuid')->on('users');
+            $table->foreign('site_id')->references('id')->on('sites');
+            $table->foreign('user_id')->references('id')->on('users');
         });
 
         Schema::create('organizations_roles_pivot', function(Blueprint $table){
-            $table->uuid('parent_organization');
-            $table->uuid('parent_user');
-            $table->enum('authorization', ['owner', 'admin', 'user']);
+            $table->increments('id');
+            $table->uuid('uuid')->unique();
+            $table->unsignedInteger('organization_id');
+            $table->unsignedInteger('user_id');
+            $table->enum('authorization', ['owner', 'admin', 'draftonly', 'readonly']);
             $table->softDeletes();
             $table->timestamps();
 
-            $table->foreign('parent_organization')->references('uuid')->on('organizations');
-            $table->foreign('parent_user')->references('uuid')->on('users');
+            $table->foreign('organization_id')->references('id')->on('organizations');
+            $table->foreign('user_id')->references('id')->on('users');
         });
 
     }

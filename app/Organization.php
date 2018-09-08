@@ -15,7 +15,7 @@ class Organization extends Model
      * @var array
      */
     protected $fillable = [
-        'parent_site',
+        'site_id',
         'name',
     ];
 
@@ -39,6 +39,6 @@ class Organization extends Model
     }
 
     public function site() {
-        return $this->hasMany('App\Site', 'parent_site');
+        return $this->hasMany('App\Site');
     }
 }
