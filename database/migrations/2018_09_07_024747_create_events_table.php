@@ -80,6 +80,15 @@ class CreateEventsTable extends Migration
             $table->foreign('user_id')->references('id')->on('users');
         });
 
+        Schema::create('users_organizations_subscriptions_pivot', function(Blueprint $table){
+            $table->increments('id');
+            $table->unsignedInteger('organization_id');
+            $table->unsignedInteger('user_id');
+
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('organization_id')->references('id')->on('organizations');
+        });
+
     }
 
     /**
@@ -91,6 +100,7 @@ class CreateEventsTable extends Migration
     {
         Schema::disableForeignKeyConstraints();
 
+        Schema::dropIfExists('users_organizations_subscriptions_pivot');
         Schema::dropIfExists('sites_roles_pivot');
         Schema::dropIfExists('organizations_roles_pivot');
         Schema::dropIfExists('events');
